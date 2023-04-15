@@ -54,24 +54,22 @@ async function run_benchmark() {
   try {
     const shapes = parseMNKTuples((document.getElementById('benchmark_shapes') as HTMLTextAreaElement).value)
     const alpha = 1.0;
-    const runs = 10;
+    const runs = 20;
     for (const [m, n, k] of shapes) {
       const array_a = makeRandom(m * k);
       const array_b = makeRandom(k * n);
       // warmup
-      await sgemm(m, n, k, alpha, array_a, array_b);
+      for (let i = 0; i < 10; i++){
+        await sgemm(m, n, k, alpha, array_a, array_b);
+      }
       let timeSum = 0;
       let retSum = 0;
+      const sgemmStartTime = performance.now();//[ms]
       for (let i = 0; i < runs; i++) {
-        console.time('sgemm');
-        const sgemmStartTime = performance.now();//[ms]
         const result = await sgemm(m, n, k, alpha, array_a, array_b);
         retSum += result[0];
-        const sgemmEndTime = performance.now();
-        console.timeEnd('sgemm');
-        timeSum += sgemmEndTime - sgemmStartTime;
       }
-      const avgTime = timeSum / runs;
+      const avgTime = (performance.now() - sgemmStartTime) / runs;
       const flops = m * n * k * 2 * 1000 / avgTime / 1000000000;
       message(`Sgemm of (${m}x${k}),(${k}x${n}): average ${avgTime} ms (${runs} runs), ${flops.toFixed(2)} GFLOPS`, messageTarget);
       console.log('sum of result (to avoid optimization)', retSum);

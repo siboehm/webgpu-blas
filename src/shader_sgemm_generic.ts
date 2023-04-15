@@ -31,9 +31,9 @@ fn main(
     return;
   }
   var sum: f32 = 0.0;
-  for(var k: u32 = 0u; k < K; k = k + 1u) {
+  for(var k: u32 = 0u; k < K; k = k + 1) {
     sum = fma(array_a[y * K + k], array_b[k * N + x], sum);
   }
-  array_c[x + y * N] = sum * cmeta.alpha;
+  array_c[x + y * N] = fma(cmeta.alpha, sum, array_c[x + y * N]);
 }
 `;
