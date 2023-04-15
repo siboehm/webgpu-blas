@@ -110,4 +110,9 @@ window.addEventListener('load', () => {
   document.getElementById('small_example').onclick = small_example;
   document.getElementById('run_test').onclick = run_test;
   document.getElementById('is_webgpu_enabled').innerText = (navigator as any).gpu ? 'Enabled' : 'Disabled (fallback pure JavaScript implementation will be used)';
+
+  run_benchmark();
+  run_test();
+  small_example();
 });
+
