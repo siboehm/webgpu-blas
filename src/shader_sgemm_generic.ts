@@ -32,7 +32,7 @@ fn main(
   }
   var sum: f32 = 0.0;
   for(var k: u32 = 0u; k < K; k = k + 1u) {
-    sum = array_a[y * K + k] * array_b[k * N + x] + sum;
+    sum = fma(array_a[y * K + k], array_b[k * N + x], sum);
   }
   array_c[x + y * N] = sum * cmeta.alpha;
 }
