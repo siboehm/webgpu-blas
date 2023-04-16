@@ -14,7 +14,7 @@ export async function sgemm(m: number, n: number, k: number, alpha: number, a: F
   }
   if (result === null) {
     useFallback = true;
-    return sgemm_fallback(m, n, k, alpha, a, b, beta, c);
+    result = sgemm_fallback(m, n, k, alpha, a, b, beta, c);
   }
   return result;
 }
