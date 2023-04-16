@@ -71,6 +71,12 @@ npm run webpack
 - [WSGL Language Spec](https://www.w3.org/TR/WGSL/)
 - [WebGPU Spec](https://www.w3.org/TR/webgpu/) and [MDN API Docs](https://developer.mozilla.org/en-US/docs/Web/API/WebGPU_API)
 
+
+### CUDA Translations
+- Workgroup: Block / CTA
+  - Workgroup_size is the blocksize
+- local invocation id: threadIdx
+
 # License
 
 MIT
