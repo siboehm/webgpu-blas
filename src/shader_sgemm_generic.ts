@@ -13,12 +13,13 @@ struct CMeta {
   N: f32,
   K: f32,
   alpha: f32,
+  beta: f32,
 }
 
 @group(0) @binding(3)
 var<storage,read> cmeta: CMeta;
 
-const CHUNK_SIZE: u32 = 8u;
+const CHUNK_SIZE: u32 = 8;
 
 var<workgroup> As: array<f32, CHUNK_SIZE * CHUNK_SIZE>;
 var<workgroup> Bs: array<f32, CHUNK_SIZE * CHUNK_SIZE>;
@@ -64,7 +65,7 @@ fn main(
     workgroupBarrier();
   }
   if (row < M && col < N) {
-    array_c[row * N + col] = fma(cmeta.alpha, sum, array_c[row * N + col]);
+    array_c[row * N + col] = fma(cmeta.alpha, sum, cmeta.beta * array_c[row * N + col]);
   }
 }
 `;

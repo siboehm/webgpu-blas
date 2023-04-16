@@ -198,7 +198,7 @@ class WebGPURunner {
 
 const runner = new WebGPURunner();
 
-async function sgemm_block(m: number, n: number, k: number, alpha: number, a: Float32Array, b: Float32Array): Promise<Float32Array> {
+async function sgemm_block(m: number, n: number, k: number, alpha: number, beta: number, a: Float32Array, b: Float32Array): Promise<Float32Array> {
   const shader = ShaderSgemmBlock;
 
   const cache_key = 'sgemm_block';
@@ -214,9 +214,9 @@ async function sgemm_block(m: number, n: number, k: number, alpha: number, a: Fl
       { index: 0, name: 'array_a', length: m * k, input: true, output: false },
       { index: 1, name: 'array_b', length: k * n, input: true, output: false },
       { index: 2, name: 'array_c', length: m * n, input: false, output: true },
-      { index: 3, name: 'meta', length: 7, input: true, output: false },
+      { index: 3, name: 'meta', length: 8, input: true, output: false },
     ],
-    inputData: { array_a: a, array_b: b, meta: new Float32Array([m, n, k, m / 4, n / 4, k / 4, alpha]) },
+    inputData: { array_a: a, array_b: b, meta: new Float32Array([m, n, k, m / 4, n / 4, k / 4, alpha, beta]) },
     threadGroups: { x: n / 64, y: m / 32, z: 1 }
   };
 
@@ -224,7 +224,7 @@ async function sgemm_block(m: number, n: number, k: number, alpha: number, a: Fl
   return result.outputData.array_c;
 }
 
-async function sgemm_generic(m: number, n: number, k: number, alpha: number, a: Float32Array, b: Float32Array): Promise<Float32Array> {
+async function sgemm_generic(m: number, n: number, k: number, alpha: number, beta: number, a: Float32Array, b: Float32Array): Promise<Float32Array> {
   const shader = ShaderSgemmGeneric;
 
   const cache_key = 'sgemm_generic';
@@ -240,9 +240,9 @@ async function sgemm_generic(m: number, n: number, k: number, alpha: number, a: 
       { index: 0, name: 'array_a', length: m * k, input: true, output: false },
       { index: 1, name: 'array_b', length: k * n, input: true, output: false },
       { index: 2, name: 'array_c', length: m * n, input: false, output: true },
-      { index: 3, name: 'meta', length: 4, input: true, output: false },
+      { index: 3, name: 'meta', length: 5, input: true, output: false },
     ],
-    inputData: { array_a: a, array_b: b, meta: new Float32Array([m, n, k, alpha]) },
+    inputData: { array_a: a, array_b: b, meta: new Float32Array([m, n, k, alpha, beta]) },
     threadGroups: { x: Math.ceil(n / 8), y: Math.ceil(m / 8), z: 1 }
   };
 
@@ -253,10 +253,6 @@ async function sgemm_generic(m: number, n: number, k: number, alpha: number, a: 
 
 
 export async function sgemm(m: number, n: number, k: number, alpha: number, a: Float32Array, b: Float32Array, beta: number = 0.0, c?: Float32Array): Promise<Float32Array> {
-  if (beta !== 0.0) {
-    throw new Error('beta !== 0.0 is not yet supported');
-  }
-
   await runner.init();
   if (!runner.isSupportedDevice) {
     // do fallback
@@ -264,8 +260,8 @@ export async function sgemm(m: number, n: number, k: number, alpha: number, a: F
   }
 
   if (m % 32 === 0 && n % 64 === 0 && k % 4 === 0 && alpha === 1.0) {
-    return sgemm_block(m, n, k, alpha, a, b);
+    return sgemm_block(m, n, k, alpha, beta, a, b);
   } else {
-    return sgemm_generic(m, n, k, alpha, a, b);
+    return sgemm_generic(m, n, k, alpha, beta, a, b);
   }
 }

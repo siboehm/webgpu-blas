@@ -16,6 +16,7 @@ struct CMeta {
   ND4: f32,
   KD4: f32,
   alpha: f32,
+  beta: f32,
 }
 
 @group(0) @binding(3)
@@ -37,6 +38,7 @@ fn main(
     return;
   }
   var alpha: f32 = cmeta.alpha;
+  var beta: f32 = cmeta.beta;
   var sum00: vec4<f32> = vec4<f32>();
   var sum01: vec4<f32> = vec4<f32>();
   var sum02: vec4<f32> = vec4<f32>();
@@ -92,13 +94,13 @@ fn main(
     sum12 = fma(vec4<f32>(arow2.w), brow, sum12);
     sum13 = fma(vec4<f32>(arow3.w), brow, sum13);
   }
-  array_c[x * 2u + 0u + (y * 4u + 0u) * ND4] = sum00 * alpha;
-  array_c[x * 2u + 0u + (y * 4u + 1u) * ND4] = sum01 * alpha;
-  array_c[x * 2u + 0u + (y * 4u + 2u) * ND4] = sum02 * alpha;
-  array_c[x * 2u + 0u + (y * 4u + 3u) * ND4] = sum03 * alpha;
-  array_c[x * 2u + 1u + (y * 4u + 0u) * ND4] = sum10 * alpha;
-  array_c[x * 2u + 1u + (y * 4u + 1u) * ND4] = sum11 * alpha;
-  array_c[x * 2u + 1u + (y * 4u + 2u) * ND4] = sum12 * alpha;
-  array_c[x * 2u + 1u + (y * 4u + 3u) * ND4] = sum13 * alpha;
+  array_c[x * 2u + 0u + (y * 4u + 0u) * ND4] = sum00 * alpha + beta * array_c[x * 2u + 0u + (y * 4u + 0u) * ND4];
+  array_c[x * 2u + 0u + (y * 4u + 1u) * ND4] = sum01 * alpha + beta * array_c[x * 2u + 0u + (y * 4u + 1u) * ND4];
+  array_c[x * 2u + 0u + (y * 4u + 2u) * ND4] = sum02 * alpha + beta * array_c[x * 2u + 0u + (y * 4u + 2u) * ND4];
+  array_c[x * 2u + 0u + (y * 4u + 3u) * ND4] = sum03 * alpha + beta * array_c[x * 2u + 0u + (y * 4u + 3u) * ND4];
+  array_c[x * 2u + 1u + (y * 4u + 0u) * ND4] = sum10 * alpha + beta * array_c[x * 2u + 1u + (y * 4u + 0u) * ND4];
+  array_c[x * 2u + 1u + (y * 4u + 1u) * ND4] = sum11 * alpha + beta * array_c[x * 2u + 1u + (y * 4u + 1u) * ND4];
+  array_c[x * 2u + 1u + (y * 4u + 2u) * ND4] = sum12 * alpha + beta * array_c[x * 2u + 1u + (y * 4u + 2u) * ND4];
+  array_c[x * 2u + 1u + (y * 4u + 3u) * ND4] = sum13 * alpha + beta * array_c[x * 2u + 1u + (y * 4u + 3u) * ND4];
 }
 `;
